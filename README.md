@@ -5,4 +5,12 @@ Utilizing existing hierarchical medical ontology as prior general knowledge, MUG
 
 ![Flowchart](images/MUGSFlowchart.png)
 
-Main.R is the R script we used to learn embeddings for MGB and BCH. We need to input the SPPMI matrices and initial single-site embeddings from MGB and BCH. Since these were constructed based on patient-level data, which could not be made publiclly accessible due to privacy constraints. 
+'Main.R' is the R script we used to learn embeddings for MGB and BCH, requiring input of the SPPMI matrices and initial single-site embeddings from these institutions. Since these were constructed based on patient-level data, they could not be made publicly accessible due to privacy constraints. We utilized the existing hierarchical medical ontology of PheCodes, LOINC codes, and RxNorms to group similar codes. For PheCodes, we used the integer level to form groups. For example, PheCode:250.1, PheCode:250.2, and PheCode:250.11 are grouped under PheCode:250. Hierarchical ontologies for LOINC and RxNorm can be found at https://shiny.parse-health.org/hierarchies/. 
+
+After aligning the two sets of embeddings via solving the orthogonal procrustes problem, we trained the initial embeddings for group effects, code effects, and code-site effects by pooling the two sets of embeddings. The process is a standard regression/ANOVE problem, treating code-site effects as residuals. 
+
+We then commenced our core algorithm: updating group effects, code effects, and code-site effects in an alternating and iterative fashion. The three key functions are given in 'MUGSFun.R'. 'GroupEff_par' and 'CodeSiteEff_l2_par'are used to update group effects, and code-site effects, respectively, utilizing parallel computations across multiple cores or machines to enhance speed. 'CodeEff_Matrix' is used to update code effects via matrix computations. 
+
+For hyperparameter tuning, we leveraged silver-standard pediatric PheCode-RxNorm and PheCode-PheCode pairs curated from pediatric articles. This helped select the optimal tuning parameters associated with the penalties on code effects and code-site effects without the need for data splitting. The performance of different sets of embeddings with different tuning parameters was evaluated using 'Embed_Eval_Pediatric.R'. It is designed to evaluate the accuracy of the embeddings in identifying established related pairs versus random pairs across a wide range of settings.
+
+
