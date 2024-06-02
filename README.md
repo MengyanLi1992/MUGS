@@ -11,6 +11,9 @@ After aligning the two sets of embeddings via solving the orthogonal procrustes 
 
 We then commenced our core algorithm: updating group effects, code effects, and code-site effects in an alternating and iterative fashion. The three key functions are given in 'MUGSFun.R'. 'GroupEff_par' and 'CodeSiteEff_l2_par'are used to update group effects, and code-site effects, respectively, utilizing parallel computations across multiple cores or machines to enhance speed. 'CodeEff_Matrix' is used to update code effects via matrix computations. 
 
-For hyperparameter tuning, we leveraged silver-standard pediatric PheCode-RxNorm and PheCode-PheCode pairs curated from pediatric articles. This helped select the optimal tuning parameters associated with the penalties on code effects and code-site effects without the need for data splitting. The performance of different sets of embeddings with different tuning parameters was evaluated using 'Embed_Eval_Pediatric.R'. It is designed to evaluate the accuracy of the embeddings in identifying established related pairs versus random pairs across a wide range of settings.
+For hyperparameter tuning, we leveraged silver-standard pediatric PheCode-RxNorm and PheCode-PheCode pairs curated from pediatric articles. This helped select the optimal tuning parameters associated with the penalties on code effects and code-site effects without the need for data splitting. The performance of different sets of embeddings with different tuning parameters was evaluated using 'Embed_Eval_Pediatric.R'. It is designed to assess the accuracy of the embeddings in identifying established related pairs versus random pairs across a wide range of settings.
+
+Although we cannot share the data used to generate the embeddings, we have developed a Shiny App (https://shiny.parse-health.org/multi-view-net/) to support downstream tasks such as feature engineering, construction of pediatric knowledge graphs, and more.
+
 
 
