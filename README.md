@@ -3,7 +3,7 @@ We develop MUlti-source Graph Synthesis (MUGS), an algorithm designed to create 
 
 Utilizing existing hierarchical medical ontology as prior general knowledge, MUGS facilitates efficient transfer learning by grouping similar codes, thereby enhancing the transferability of knowledge from general to pediatric systems. To address the heterogeneity within code groups and between sites, we propose to decompose a code embedding into three components: the group effect, defined based on the hierarchical medical ontology; the site-nonspecific code effect, capturing characteristics of a code that differ from its group effect and are shared between health systems; and the code-site effect, identifying site-specific traits of a code. Importantly, this decomposition, coupled with penalty functions applied to the code and code-site effects, provides adaptability to varying degrees of heterogeneity within code groups and between sites and protects against the adverse effects of negative knowledge transfer via hyperparameter tuning.
 
-![Flowchart](MUGSFlowchart.png)
+![Flowchart](images/MUGSFlowchart.png)
 
 'Main.R' is the R script we used to learn embeddings for MGB and BCH, requiring input of the SPPMI matrices and initial single-site embeddings from these institutions. Since these were constructed based on patient-level data, they could not be made publicly accessible due to privacy constraints. We utilized the existing hierarchical medical ontology of PheCodes, LOINC codes, and RxNorms to group similar codes. For PheCodes, we used the integer level to form groups. For example, PheCode:250.1, PheCode:250.2, and PheCode:250.11 are grouped under PheCode:250. Hierarchical ontologies for LOINC and RxNorm can be found at https://shiny.parse-health.org/hierarchies/. 
 
