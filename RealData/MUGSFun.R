@@ -10,38 +10,41 @@ GroupEff_par <- function(S.MGB, S.BCH, n.MGB, n.BCH, U.MGB, U.BCH, V.MGB, V.BCH,
   colnames(BETA.BCHonly) <- BCH.only
   BETA.MGBonly <- matrix(0, p, n.MGB.only )
   colnames(BETA.MGBonly) <- MGB.only
-  for (j in 1:n.BCH.only){
-    nn <- n.j.BCH[names(n.j.BCH)==BCH.only[j]]
-    temp.BCH <- matrix(0,nn,p)
-    for (jj in 1: nn){
-      temp.BCH[jj,] <- as.vector((V.BCH[X.BCH.group[, colnames(X.BCH.group)==BCH.only[j] ]>0,])[jj,] - beta.int[rownames(beta.int)==BCH.only[j],] )
+  if (n.BCH.only >0){
+    for (j in 1:n.BCH.only){
+      nn <- n.j.BCH[names(n.j.BCH)==BCH.only[j]]
+      temp.BCH <- matrix(0,nn,p)
+      for (jj in 1: nn){
+        temp.BCH[jj,] <- as.vector((V.BCH[X.BCH.group[, colnames(X.BCH.group)==BCH.only[j] ]>0,])[jj,] - beta.int[rownames(beta.int)==BCH.only[j],] )
+      }
+      name.BCH <- (name.list[(1+n.MGB):(n.MGB + n.BCH)])[X.BCH.group[,colnames(X.BCH.group)==BCH.only[j]]>0]
+      Y.BCH.1 <-as.vector(S.BCH[,rownames(S.BCH)%in%name.BCH])
+      Y.BCH <- Y.BCH.1 - as.vector(as.matrix(U.BCH)%*%t(temp.BCH)) 
+      V.j.BCH <- do.call(rbind, replicate(nn, U.BCH, simplify=FALSE))
+      m <- glmnet(V.j.BCH, Y.BCH, alpha = 0, family = 'gaussian', lambda = lambda*2/length(Y.BCH), intercept=F)
+      BETA.BCHonly[,j] <- as.vector(m$beta)
     }
-    name.BCH <- (name.list[(1+n.MGB):(n.MGB + n.BCH)])[X.BCH.group[,colnames(X.BCH.group)==BCH.only[j]]>0]
-    Y.BCH.1 <-as.vector(S.BCH[,rownames(S.BCH)%in%name.BCH])
-    Y.BCH <- Y.BCH.1 - as.vector(as.matrix(U.BCH)%*%t(temp.BCH)) 
-    V.j.BCH <- do.call(rbind, replicate(nn, U.BCH, simplify=FALSE))
-    m <- glmnet(V.j.BCH, Y.BCH, alpha = 0, family = 'gaussian', lambda = lambda*2/length(Y.BCH), intercept=F)
-    BETA.BCHonly[,j] <- as.vector(m$beta)
   }
-  for (j in 1:n.MGB.only){
-    nn <- n.j.MGB[names(n.j.MGB)==MGB.only[j]]
-    temp.MGB <- matrix(0,nn,p)
-    for (jj in 1: nn){
-      temp.MGB[jj,] <- as.vector((V.MGB[X.MGB.group[, colnames(X.MGB.group)==MGB.only[j] ]>0,])[jj,] - beta.int[rownames(beta.int)==MGB.only[j],] )
+  if (n.MGB.only >0){
+    for (j in 1:n.MGB.only){
+      nn <- n.j.MGB[names(n.j.MGB)==MGB.only[j]]
+      temp.MGB <- matrix(0,nn,p)
+      for (jj in 1: nn){
+        temp.MGB[jj,] <- as.vector((V.MGB[X.MGB.group[, colnames(X.MGB.group)==MGB.only[j] ]>0,])[jj,] - beta.int[rownames(beta.int)==MGB.only[j],] )
+      }
+      name.MGB <- (name.list[1:n.MGB])[X.MGB.group[,colnames(X.MGB.group)==MGB.only[j]]>0]
+      Y.MGB.1 <- as.vector(S.MGB[,rownames(S.MGB)%in%name.MGB])
+      Y.MGB <- Y.MGB.1 - as.vector(as.matrix(U.MGB)%*%t(temp.MGB)) 
+      V.j.MGB <- do.call(rbind, replicate(nn, U.MGB, simplify=FALSE))
+      m <- glmnet(V.j.MGB, Y.MGB, alpha = 0, family = 'gaussian', lambda = lambda*2/length(Y.MGB), intercept=F)
+      BETA.MGBonly[,j] <- as.vector(m$beta)
     }
-    name.MGB <- (name.list[1:n.MGB])[X.MGB.group[,colnames(X.MGB.group)==MGB.only[j]]>0]
-    Y.MGB.1 <- as.vector(S.MGB[,rownames(S.MGB)%in%name.MGB])
-    Y.MGB <- Y.MGB.1 - as.vector(as.matrix(U.MGB)%*%t(temp.MGB)) 
-    V.j.MGB <- do.call(rbind, replicate(nn, U.MGB, simplify=FALSE))
-    m <- glmnet(V.j.MGB, Y.MGB, alpha = 0, family = 'gaussian', lambda = lambda*2/length(Y.MGB), intercept=F)
-    BETA.MGBonly[,j] <- as.vector(m$beta)
   }
   cl <- makeCluster(n.core, type="SOCK") 
   registerDoSNOW (cl)
   n.both <- n.group - n.BCH.only - n.MGB.only
   name.both <- setdiff(colnames(X.MGB.group),c(BCH.only, MGB.only))
   BETA = foreach(j = 1:n.both, .packages = c("glmnet"), .combine = 'cbind') %dopar%{
-    print(j)
     name.MGB <- (name.list[1:n.MGB])[X.MGB.group[, colnames(X.MGB.group)==name.both[j]]>0]
     name.BCH <- (name.list[(1+n.MGB):(n.MGB + n.BCH)])[X.BCH.group[,colnames(X.BCH.group)==name.both[j]]>0]
     temp.MGB <- V.MGB[X.MGB.group[,colnames(X.MGB.group)==name.both[j]]>0,] - do.call(rbind, replicate(length(name.MGB),  beta.int[rownames(beta.int)==name.both[j],], simplify=FALSE))
@@ -65,7 +68,6 @@ GroupEff_par <- function(S.MGB, S.BCH, n.MGB, n.BCH, U.MGB, U.BCH, V.MGB, V.BCH,
   output <- list("beta" = beta, "dif_F" = dif_F,'V.MGB.new' = V.MGB.new, 'V.BCH.new' = V.BCH.new)
   return(output)
 }
-
 
 CodeEff_Matrix<- function(S.1, S.2, n1, n2, U.1, U.2, V.1, V.2, common_codes, zeta.int, lambda, p){
   #### function used to estimate code effects 

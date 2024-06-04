@@ -1,17 +1,3 @@
-get_embed = function(mysvd, d=2000, normalize=TRUE){
-  # this is the function for getting embedding from svd
-  # d: dim of the final embedding
-  # mysvd: the (managed) svd result (adding an element with 'names')
-  id = which(sign(mysvd$u[1,])==sign(mysvd$v[1,]))
-  id = id[1:min(d,length(id))]
-  embed = mysvd$u[,id]%*%diag(sqrt(mysvd$d[id]))
-  if(normalize){
-    embed = embed/apply(embed,1,norm,'2')
-  }
-  rownames(embed) = mysvd$names
-  return(embed)
-}
-
 Cos_id_boot = function(pairs, dict, g1, g2, type = 1){
   # type: 1 or 2: 
   ## type 1: sample from pairs; type 2: sample from dict
