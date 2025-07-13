@@ -259,7 +259,7 @@ source('MUGSFun.R')
 ###### Load in functions for validation the embeddings 
 source('Embed_Eval_Pediatric.R')
 ###### Silver-standard labels for 
-AllRelationPairs <- readRDS("newUTD.CV.0501.rds")
+AllRelationPairs <- readRDS("new.CV.rds")
 
 
 tic('main loop')
