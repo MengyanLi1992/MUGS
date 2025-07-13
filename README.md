@@ -15,4 +15,4 @@ Although we cannot share the data used to generate the embeddings, we have devel
 
 We have also provided a simulated example in the 'Demo' folder. We mimic the structure of our real data and generate two SPPMI matrices, two dummy matrices based on prior group structures, and code-code pairs for tuning and evaluation using the function 'DataGen_rare_group' in 'MUGSFun_sim.R'. The three key functions for updating group effects, code effects, and code-site effects are the same as those used for real data analysis. Additionally, we have provided a simplified function, 'evaluation.sim', for evaluation using the established code-code pairs and the set of embedding vectors.
 
-
+The updated code and R package can be found at https://github.com/celehs/MUGS.
